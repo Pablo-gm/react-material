@@ -1,9 +1,8 @@
-import { FormControl, FormControlLabel, FormLabel, Grid, makeStyles, Radio, RadioGroup, TextField } from '@material-ui/core';
 import React, { useState, useEffect } from 'react'
-import Controls from '../../components/controls/Controls';
-
-import {useForm, Form} from '../../components/useForm';
-import * as employeeService from '../../services/employeeService'
+import { Grid, } from '@material-ui/core';
+import Controls from "../../components/controls/Controls";
+import { useForm, Form } from '../../components/useForm';
+import * as employeeService from "../../services/employeeService";
 
 const genderItems = [
     {id: 'male', title: 'Male'},
@@ -23,7 +22,8 @@ const initialValues = {
     isPermanent: false
 }
 
-function EmployeeForm() {
+function EmployeeForm(props) {
+    const { addOrEdit, recordForEdit } = props
 
     const validate = (fieldValues = values) => {
         let temp = {...errors};
@@ -47,15 +47,20 @@ function EmployeeForm() {
     const {values, setValues, errors, setErrors, 
         handleInputChange, resetForm} = useForm(initialValues, true, validate);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
-        if(validate()){
-            employeeService.insertEmployee(values);
-            resetForm();
+    const handleSubmit = e => {
+        e.preventDefault()
+        if (validate()) {
+            addOrEdit(values, resetForm);
         }
-        console.log(errors);
     }
+
+
+    useEffect(() => {
+        if (recordForEdit != null)
+            setValues({
+                ...recordForEdit
+            })
+    }, [recordForEdit])
 
     return (
         <Form onSubmit={handleSubmit}>
